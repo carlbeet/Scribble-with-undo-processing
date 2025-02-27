@@ -8,6 +8,12 @@ boolean controlDown = false;
 boolean shiftDown = false;
 int flagIndex = 0;
 
+/*
+Debug Log
+line 106   originally counted i up (i++) from flagindex to size. everytime we remove, the indices change OMG.
+line 101   need to break-- exit for loop once we find the first flag.
+   
+*/
 
 void setup() {
 size(1000, 800); 
@@ -32,14 +38,15 @@ if (mousePos.size() != 0) {
 }
     
 if(controlDown) {
+  println("undo init");
   if (keyCode == 'Z') {
     undo();
     controlDown = false;
-  }
   if (shiftDown) {
     redo();
     shiftDown = false;
   }
+}
 }
 }
 
@@ -82,7 +89,7 @@ public void undo() {
   flagIndex = 0;
   //debugger: 
   for (int i = 0; i < mousePos.size();  i++) {
-println(mousePos.get(i).getPos().x);
+println("mousePos x before: " + mousePos.get(i).getPos().x);
 }
  println("flag index" + flagIndex);
  println("size" + mousePos.size());
@@ -91,35 +98,52 @@ println(mousePos.get(i).getPos().x);
     if(mousePos.get(i).getPos().x == 2001) {
       flagIndex = i; //all data that is after the flag, we pop from top
                      // last in, first out
+      break; //debug log
     }
   }
       println("flag index" + flagIndex);
       println(mousePos.size());
   for (int i = mousePos.size()-1; i > flagIndex; i --) {
     redo.add(mousePos.get(i));
+    println("removed: " + mousePos.get(i).getPos());
     mousePos.remove(i);
     //debug -originally counted i up (i++) from flagindex to size. everytime we remove, the indices change OMG.
-    println("removed: " + mousePos.get(i).getPos());
+   
   }
   println(mousePos.size());
+   for (int i = 0; i < mousePos.size();  i++) {
+println("mousePos x after undo: " + mousePos.get(i).getPos().x);
+}
 
-//for (int i = 0; i < mousePos.size();  i++) {
-//println(mousePos.get(i).getPos().x);
-//}
   //debugger: 
-  for (int i = 0; i < redo.size();  i++) {
-println(redo.get(i).getPos().x);
+//  for (int i = 0; i < redo.size();  i++) {
+//println(redo.get(i).getPos().x);
 }
-}
+
+
 
 public void redo() {
+  int counter = 0;
   if (flagIndex != 0) {
-    mousePos.add(flag);
-    for (int i = redo.size()-1; i > 0; i -- ) {
+    for (int i = redo.size()-1; i >= 0; i -- ) {
+      
+    if(redo.get(i).getPos().x == 2001) {
+      counter ++;
+      if (counter == 1) {
+      break; }
+    }
       PVec redopos = new PVec(redo.get(i).getPos().x, redo.get(i).getPos().y);
     mousePos.add(redopos);
+    println("added: " + redopos.getPos());
     redo.remove(i);
 }
+    mousePos.add(flag); //add one flag at the end & we're all set!
   }
+  counter = 0;
+    for (int i = 0; i < mousePos.size();  i++) {
+println("mousePos x after redo: " + mousePos.get(i).getPos().x);
 }
+}
+  
+
   
